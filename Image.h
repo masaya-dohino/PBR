@@ -1,72 +1,103 @@
 #pragma once
-#ifndef IMAGE_H
-#define IMAGE_H
-#include<iostream>
-#include<fstream>
-#include<cmath>
-#include<string>
-#include"Vec_3.h"
-#include"util.h"
+
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <string>
+#include <array>
+
+#include "Vec3.h"
+#include "Util.h"
 
 class Image {
 public:
-	int width; //横幅
-	int height; //縦幅
-	Vec3*data;//ピクセルの配列
+	const int height;
+	const int width;
 
-	Image(int _width, int _height) : width(_width), height(_height) {
-		data = new Vec3[width*height];
-	};
+	Vec3* data;
+
+	Image(int _h, int _w) : height(_h), width(_w) {
+		data = new Vec3[height*width];
+	}
 
 	~Image() {
 		delete[] data;
-	};
+	}
 
-	//ピクセル(i,j)の色を取り出す
-	Vec3 getPixel(int i, int j) const {
-		return data[i + width * j];
-	};
 
-	//ピクセル(i,j)に色をセットする
-	void setPixel(int i, int j, const Vec3& c) {
-		data[i + width * j] = c ;
-	};
+	Vec3 getPixel(int r, int c) const {
+		try {
+			if (r < 0 || r >= height) {
+				throw "Invalid Index for Col in setPixel";
+			}
+			else if (c < 0 || c >= width) {
+				throw "Invalid Index for Row in setPixel";
+			}
+			return data[width*r + c];
+		}
+		catch (const char* e) {
+			throw e;
+			return Vec3(0.0, 0.0, 0.0);
+		}
+	}
 
-	//すべてのピクセルを一定の値で割る
-	void divide(double k) {
-		for (int i = 0; i < width; i++){
-			for (int j = 0; j < height; j++) {
-				this->setPixel(i, j,this->getPixel(i,j)/k);
+	Image& setPixel(int r, int c, const Vec3& v) {
+		try {
+			if (r < 0 || r >= height) {
+				throw "Invalid Index for Col in setPixel";
+			}
+			else if (c < 0 || c >= width) {
+				throw "Invalid Index for Row in setPixel";
+			}
+			data[width*r + c] = v;
+			return *this;
+		}
+		catch (const char* e) {
+			throw e;
+			return *this;
+		}
+	}
+
+	void divide(const double& k) {
+		for (int r = 0; r < height; r++) {
+			for (int c = 0; c < width; c++) {
+				setPixel(r, c, getPixel(r, c) / k);
 			}
 		}
-	};
+		return;
+	}
 
-	void gamma_correction() {
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				Vec3 c = this->getPixel(i, j);
-				this->setPixel(i, j, Vec3(std::pow(c.x, 1 / 2.2), std::pow(c.y, 1 / 2.2), std::pow(c.z, 1 / 2.2)));
+	void gammaCorrection() {
+		for (int r = 0; r < height; r++) {
+			for (int c = 0; c < width; c++) {
+				Vec3 v = getPixel(r, c);
+				setPixel(r, c,
+					Vec3(std::pow(v.x, 1.0 / 2.2), std::pow(v.y, 1.0 / 2.2), std::pow(v.z, 1.0 / 2.2)));
 			}
 		}
-	};
-	//PPM画像出力
-	void ppm_output(const std::string& filename) const {
-		std::ofstream file(filename);
-		file << "P3" << std::endl;
-		file << width << " " << height << std::endl;
-		file << "255" << std::endl;
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				Vec3 c = this->getPixel(i, j);
-				int r = clamp(int(255 * c.x), 0, 255);
-				int g = clamp(int(255 * c.y), 0, 255);
-				int b = clamp(int(255 * c.z), 0, 255);
-				file << r << " " << g << " " << b << std::endl;
+		return;
+	}
+
+	void writePPM(const std::string& filename) const {
+		std::ofstream fs(filename);
+
+		fs << "P3\n";
+		fs << width << " " << height << "\n";
+		fs << 255 << "\n";
+
+		for (int r = 0; r < height; ++r) {
+			for (int c = 0; c < width; ++c) {
+				Vec3 v = getPixel(r, c);
+				const int r = clamp(static_cast<int>(v.x*255.0), 0, 255);
+				const int g = clamp(static_cast<int>(v.y*255.0), 0, 255);
+				const int b = clamp(static_cast<int>(v.z*255.0), 0, 255);
+				fs << r << " " << g << " " << b << "\n";
 			}
 		}
-		file.close();
-	};
+
+		fs.close();
+
+		return;
+	}
 
 };
-
-#endif
