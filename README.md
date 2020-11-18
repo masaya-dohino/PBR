@@ -1,7 +1,7 @@
 ## Physically Based Rendering
-物理ベースレンダリングの実装
+物理ベースレンダリングの入門
 
 
-修士論文：髪の毛の構造発色シミュレーションのレンダリングのために
+レイトレーシング、パストレーシングについて勉強した。
 
-# 実装中
+![render107](https://user-images.githubusercontent.com/57475794/99528473-b1111800-29e1-11eb-817d-a4fb228cd7fb.jpeg)
