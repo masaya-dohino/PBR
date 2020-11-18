@@ -3,5 +3,6 @@
 
 
 レイトレーシング、パストレーシングについて勉強した。
+制作結果
+![render](https://user-images.githubusercontent.com/57475794/99528685-01887580-29e2-11eb-984f-2ef2d25c1cea.jpg)
 
-![render107](https://user-images.githubusercontent.com/57475794/99528473-b1111800-29e1-11eb-817d-a4fb228cd7fb.jpeg)
